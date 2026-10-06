@@ -1,4 +1,31 @@
+/* NATIVE HTML */
 
-body{
-  background-color: white;
+* {
+    margin: 0%;
+    font-family: monospace;
+}
+
+header {
+  width: 100vw;
+  height: 8vh;
+  background-color: #ee1515;
+  display: flex;
+  align-items: center;
+}
+
+/* HEADER */
+
+.header__link {
+  font-size: 3vh;
+  margin-left: 2vw;
+  text-decoration: none;
+  color:#000000;
+}
+
+.header__link:hover {
+    color:#15eeee;
+}
+
+.header__link:active {
+    color: #0000ff;
 }
