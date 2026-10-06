@@ -13,7 +13,19 @@ header {
   align-items: center;
 }
 
+/* UTILITY */
+.U-flexAlignJustify {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* HEADER */
+
+.header__img {
+  height: 7vh;
+  margin-left: 1vw;
+}
 
 .header__link {
   font-size: 3vh;
@@ -28,4 +40,48 @@ header {
 
 .header__link:active {
     color: #0000ff;
+}
+
+/* HOME */
+
+#home {
+  width:100vw;
+  height:92vh;
+  font-size: 2vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#home__titleRow {
+  width:100vw;
+  height:6vh;
+}
+
+#home__titleRow__text {
+  font-size: 7vh;
+}
+
+#home__imgRow {
+  width:100vw;
+  height:25vh;
+}
+
+#home__descriptionRow {
+  width:100vw;
+  height:5vh;
+}
+
+#home__descriptionRow__text {
+  font-size:4vh;
+}
+
+#home__statsRow {
+  width:100vw;
+  height:50vh;
+}
+
+#home__inputRow {
+  width:100vw;
+  height:6vh;
 }
