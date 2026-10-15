@@ -3,43 +3,59 @@ import { getJSON } from "~/helpers";
 
 export function meta() {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Pokemon Stats Visuliser" },
+    { name: "Home", content: "Pokemon Stats" },
   ];
 }
 
 
 export default function Home() {
+  const [pokemonData, setPokemonData] = useState<any>()
+
+  useEffect(() => {
+    getJSON("bulbasaur").then((data) => {
+      setPokemonData(data);
+      console.log(data.image);
+    })
+
+  }, [])
   return (
     <section id="home">
       <div id="home__titleRow" className="U-flexAlignJustify">
         <h1 id="home__titleRow__text">Pokemon Stats Visualiser</h1>
       </div>
-      <div id="home__imgRow"></div>
-      <div id="home__descriptionRow" className="U-flexAlignJustify">
-        <p id="home__descriptionRow__text">??? - ???</p>
+      <div id="home__imgRow">
+        <img src={pokemonData?.image}></img>
       </div>
-      <StatsDisplay />
-      <div id="home__inputRow"></div>
+      <div id="home__descriptionRow" className="U-flexAlignJustify">
+        <p id="home__descriptionRow__text">{pokemonData?.name} - {pokemonData?.types}</p>
+      </div>
+      <div id="home__statsRow" className="U-flexAlignJustify">
+        <StatsDisplay stats={pokemonData?.stats} />
+      </div>
+      <div id="home__inputRow" className="U-flexAlignJustify">
+        <p id="home__inputRow__text">Pokemon Name - </p>
+        <input id="home_inputRow_input"></input>
+      </div>
     </section>
   );
 }
 
-function StatsDisplay() {
-  const [pokemonData, setPokemonData] = useState<any>()
+interface StatsDisplayProps {
+  stats: StatRowProps[]
+}
 
-  useEffect(() => {
-    getJSON().then((value) => {
-      setPokemonData(value.results[0]);
-      console.log(value.results[0]);
-    })
-    
-  }, [])
+function StatsDisplay(props: StatsDisplayProps) {
+  const { stats } = props
 
 
-  if(!pokemonData) return <></>
+  if (!stats) return <></>
 
-  return (<StatRow name={pokemonData.name} value={3}></StatRow>)
+  return (<>
+    {stats.map((stat, index) => {
+      return (<StatRow name={stat.name} value={stat.value} key={index}></StatRow>)
+    })}
+  </>)
 }
 
 interface StatRowProps {
@@ -50,14 +66,17 @@ interface StatRowProps {
 function StatRow(props: StatRowProps) {
   const { name, value } = props
   return (
-    <div className="home__statsRow__Row">
-      <div className="home__statsRow__Row__name">
-        {name}
+    <div className="home__statsRow__row U-flexAlignJustify">
+      <div className="home__statsRow__row__name U-flexAlignJustify">
+        <p>{name}</p>
       </div>
-      <div className="home__statsRow__Row__value">
-        {value}
+      <div className="home__statsRow__row__value">
+        <div className="home__statsRow__row__value__bar U-flexAlignJustify">
+          <p className="home__statsRow__row__value__bar__text">{value}</p>
+        </div>
       </div>
     </div>
   )
 
 }
+

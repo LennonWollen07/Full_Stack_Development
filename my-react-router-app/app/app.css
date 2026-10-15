@@ -79,9 +79,43 @@ header {
 #home__statsRow {
   width:100vw;
   height:50vh;
+  flex-direction: column;
+}
+
+.home__statsRow__row {
+  width:100vw;
+  height:7vh;
+}
+
+.home__statsRow__row__name {
+  width:5vw;
+  height:7vh;
+  padding-right: 1vw;
+  font-size: 3vh;
+}
+
+.home__statsRow__row__value {
+  width:60vw;
+  height:7vh;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.home__statsRow__row__value__bar {
+  width:100%;
+  height:6vh;
+  background-color: #ee1515;
+  border-radius: 100px;
+  font-size: 3vh;
 }
 
 #home__inputRow {
   width:100vw;
   height:6vh;
+}
+
+#home__inputRow__text {
+  padding:1vh;
+  font-size:3vh;
 }

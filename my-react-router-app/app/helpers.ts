@@ -1,13 +1,13 @@
 // --- API / API data ---
-const apiURL = "https://pokeapi.co/api/v2/pokemon";
+const apiURL = "http://localhost:3000/pokemon";
 
 // gets pikachu JSON file then displays pikachu's data
-export async function getJSON() {
+export async function getJSON(pokemonName : string) {
 
     try {
 
         // get response
-        const response = await fetch(`${apiURL}?limit=10000`)
+        const response = await fetch(`${apiURL}?name=${pokemonName}`)
 
         // check response
         if (!response.ok) {
