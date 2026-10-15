@@ -8,70 +8,89 @@ export function meta() {
   ];
 }
 
-
 export default function Home() {
   const [pokemonData, setPokemonData] = useState<any>()
 
-  useEffect(() => {
-    getJSON("bulbasaur").then((data) => {
-      setPokemonData(data);
-      console.log(data.image);
-    })
+  const [pokemonName, setPokemonName] = useState<string>("pikachu");
+  const updatePokemonName = (e: any) => setPokemonName(e.target.value);
 
-  }, [])
+  // uses the pokemon data from the server to update the page info
+  function updatePageInfo() {
+    getJSON(pokemonName).then((data) => {
+      setPokemonData(data);
+    })
+  }
+
+  // displays pikachu by default
+  useEffect(updatePageInfo, [])
+
+  // on input change the page info
+  function onKeyDown(event: any) {
+    if (event.key == "Enter") {
+      updatePageInfo();
+    }
+  }
+
+
   return (
     <section id="home">
       <div id="home__titleRow" className="U-flexAlignJustify">
         <h1 id="home__titleRow__text">Pokemon Stats Visualiser</h1>
       </div>
-      <div id="home__imgRow">
-        <img src={pokemonData?.image}></img>
+
+      <div id="home__imgRow" className="U-flexAlignJustify">
+        <img id="home__imgRow__image" src={pokemonData?.image}></img>
       </div>
+
       <div id="home__descriptionRow" className="U-flexAlignJustify">
         <p id="home__descriptionRow__text">{pokemonData?.name} - {pokemonData?.types}</p>
       </div>
+
       <div id="home__statsRow" className="U-flexAlignJustify">
         <StatsDisplay stats={pokemonData?.stats} />
       </div>
+      
       <div id="home__inputRow" className="U-flexAlignJustify">
         <p id="home__inputRow__text">Pokemon Name - </p>
-        <input id="home_inputRow_input"></input>
+        <input id="home_inputRow_input" value={pokemonName} onChange={updatePokemonName} onKeyDown={onKeyDown} ></input>
       </div>
     </section>
   );
+
 }
 
 interface StatsDisplayProps {
   stats: StatRowProps[]
 }
 
+// gets the stats for the pokemon from the server
 function StatsDisplay(props: StatsDisplayProps) {
   const { stats } = props
-
 
   if (!stats) return <></>
 
   return (<>
     {stats.map((stat, index) => {
-      return (<StatRow name={stat.name} value={stat.value} key={index}></StatRow>)
+      return (<StatRow name={stat.name} value={stat.value} length={stat.length} key={index}></StatRow>)
     })}
   </>)
 }
 
 interface StatRowProps {
   name: string,
-  value: number
+  value: number,
+  length: number
 }
 
 function StatRow(props: StatRowProps) {
-  const { name, value } = props
+  const { name, value, length } = props
   return (
     <div className="home__statsRow__row U-flexAlignJustify">
       <div className="home__statsRow__row__name U-flexAlignJustify">
         <p>{name}</p>
       </div>
       <div className="home__statsRow__row__value">
-        <div className="home__statsRow__row__value__bar U-flexAlignJustify">
+        <div className="home__statsRow__row__value__bar U-flexAlignJustify" style={{ width: `${length}%` }}>
           <p className="home__statsRow__row__value__bar__text">{value}</p>
         </div>
       </div>
