@@ -1,7 +1,7 @@
 // --- API / API data ---
 const apiURL = "http://localhost:3000/pokemon";
 
-// gets pikachu JSON file then displays pikachu's data
+// gets JSON file then displays the data
 export async function getJSON(pokemonName : string) {
 
     try {
@@ -16,7 +16,7 @@ export async function getJSON(pokemonName : string) {
 
         };
 
-        // get pikachu data from JSON
+        // get data from JSON
         const pokemonData = await response.json();
 
         return pokemonData

@@ -9,7 +9,7 @@ export default function Layout() {
     )
 }
 
-
+// creates the navbar layout to be used on all pages
 function Navbar() {
     return (
         <header>

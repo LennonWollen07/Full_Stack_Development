@@ -11,6 +11,7 @@ export function meta() {
 export default function Home() {
   const [pokemonData, setPokemonData] = useState<any>()
 
+  // sets pikachu as the default display pokemon
   const [pokemonName, setPokemonName] = useState<string>("pikachu");
   const updatePokemonName = (e: any) => setPokemonName(e.target.value);
 
@@ -21,7 +22,6 @@ export default function Home() {
     })
   }
 
-  // displays pikachu by default
   useEffect(updatePageInfo, [])
 
   // on input change the page info
@@ -34,24 +34,29 @@ export default function Home() {
 
   return (
     <section id="home">
+      {/* title row */}
       <div id="home__titleRow" className="U-flexAlignJustify">
         <h1 id="home__titleRow__text">Pokemon Stats Visualiser</h1>
       </div>
 
+      {/* image row */}
       <div id="home__imgRow" className="U-flexAlignJustify">
         <img id="home__imgRow__image" src={pokemonData?.image}></img>
       </div>
 
+      {/* description row */}
       <div id="home__descriptionRow" className="U-flexAlignJustify">
         <p id="home__descriptionRow__text">{pokemonData?.name} - {pokemonData?.types}</p>
       </div>
 
+      {/* stats row */}
       <div id="home__statsRow" className="U-flexAlignJustify">
         <StatsDisplay stats={pokemonData?.stats} />
       </div>
       
+      {/* input row */}
       <div id="home__inputRow" className="U-flexAlignJustify">
-        <p id="home__inputRow__text">Pokemon Name - </p>
+        <p id="home__inputRow__text">Pokemon Name / ID - </p>
         <input id="home_inputRow_input" value={pokemonName} onChange={updatePokemonName} onKeyDown={onKeyDown} ></input>
       </div>
     </section>
