@@ -23,27 +23,12 @@ export default function StatsGameWrapper() {
 export function Stats_Game() {
 
   // extract properties from context
-  const {mode} = useContext(StatsGameContext)
-
-  // index of mode in MODE_NAMES
-  const [modeIndex, setModeIndex] = useState<number>(0)
-
-  // the pokemon data that has been fetched
-  const [pokemonData, setPokemonData] = useState<any>([])
-
-  // the answers for the game
-  const [isWinner, setIsWinner] = useState<boolean[]>([])
-
-  // How many points you have won / lost
-  const [points, setPoints] = useState<number>(0)
-
-  // check to esnure you can only click one of the answers once
-  const [hasAnswered, setHasAnswered] = useState<boolean>(false)
+  const {mode, modeIndex, pokemonDataArray, setPokemonDataArray, isWinnerArray, setIsWinnerArray , points} = useContext(StatsGameContext)
 
   // update the page information based on fetched pokemon
   const updatePageInfo = () => {
     getTwoPokemon().then((data) => {
-      setPokemonData(data);
+      setPokemonDataArray(data);
     })
   }
 
@@ -51,26 +36,26 @@ export function Stats_Game() {
 
   // when pokemon are loaded find which one has the higher stat
   useEffect(() => {
-    if (pokemonData.length == 0) return;
+    if (pokemonDataArray.length == 0) return;
 
     // first pokemon has the higher stat
-    if (pokemonData[0].stats[modeIndex].value > pokemonData[1].stats[modeIndex].value) {
-      setIsWinner([true, false])
+    if (pokemonDataArray[0].stats[modeIndex].value > pokemonDataArray[1].stats[modeIndex].value) {
+      setIsWinnerArray([true, false])
     }
 
     // second pokemon has the higher stat
-    else if (pokemonData[0].stats[modeIndex].value < pokemonData[1].stats[modeIndex].value) {
-      setIsWinner([false, true]);
+    else if (pokemonDataArray[0].stats[modeIndex].value < pokemonDataArray[1].stats[modeIndex].value) {
+      setIsWinnerArray([false, true]);
     }
 
     // in case of a draw
     else {
-      setIsWinner([true, true]);
+      setIsWinnerArray([true, true]);
     }
 
-    console.log(isWinner)
+    console.log(isWinnerArray)
 
-  }, [pokemonData])
+  }, [pokemonDataArray])
 
   return (
     <div id="statsGame">
@@ -86,14 +71,14 @@ export function Stats_Game() {
       <div id="statsGame__modesRow" className="U-flexAlignJustify">
         {MODE_NAMES.map((name, index) => {
           return (
-            <StatButton name={name} setModeIndex={setModeIndex} updatePageInfo={updatePageInfo} setPoints={setPoints} key={index}></StatButton>
+            <StatButton name={name} updatePageInfo={updatePageInfo} key={index}></StatButton>
           )
         })}
       </div>
       {/* clickable pokemon row */}
       <div id="statsGame__clickablesRow" className="U-flexAlignJustify">
-        <PokemonBox pokemonData={pokemonData[0]} modeIndex={modeIndex} isWinner={isWinner[0]} points={points} setPoints={setPoints} hasAnswered={hasAnswered} setHasAnswered={setHasAnswered} updatePageInfo={updatePageInfo}></PokemonBox>
-        <PokemonBox pokemonData={pokemonData[1]} modeIndex={modeIndex} isWinner={isWinner[1]} points={points} setPoints={setPoints} hasAnswered={hasAnswered} setHasAnswered={setHasAnswered} updatePageInfo={updatePageInfo}></PokemonBox>
+        <PokemonBox index={0} updatePageInfo={updatePageInfo}></PokemonBox>
+        <PokemonBox index={1} updatePageInfo={updatePageInfo}></PokemonBox>
       </div>
       {/* score row */}
       <div id="statsGame__scoreRow" className="U-flexAlignJustify">
@@ -110,17 +95,15 @@ export function Stats_Game() {
 // buttons components
 interface ModeNamesProps {
   name: string,
-  setModeIndex: any,
   updatePageInfo: VoidFunction,
-  setPoints: any
 }
 
 // creates a button that allows you to switch the game mode
 function StatButton(props: ModeNamesProps) {
-  const { name, setModeIndex, updatePageInfo, setPoints } = props;
+  const { name, updatePageInfo, } = props;
 
   //extract context properties
-  const {setMode} = useContext(StatsGameContext)
+  const {setMode, setModeIndex, setPoints} = useContext(StatsGameContext)
 
   // when a button is clicked
   function onClick() {
@@ -137,43 +120,37 @@ function StatButton(props: ModeNamesProps) {
 }
 
 interface pokemonBoxProps {
-  pokemonData: any,
-  modeIndex: number,
-  isWinner: boolean,
-  points: Number,
-  setPoints: Dispatch<SetStateAction<number>>,
-  hasAnswered: boolean,
-  setHasAnswered: Dispatch<SetStateAction<boolean>>,
+  index: number,
   updatePageInfo: VoidFunction
 }
 
 // clickable pokemon component
 function PokemonBox(props: pokemonBoxProps) {
-  const { pokemonData, modeIndex, isWinner, points, setPoints, hasAnswered, setHasAnswered, updatePageInfo } = props;
+  const { index, updatePageInfo } = props;
 
   //extract context properties
-  const {mode} = useContext(StatsGameContext)
+  const {mode, modeIndex, pokemonDataArray, isWinnerArray, points, setPoints, hasAnswered, setHasAnswered} = useContext(StatsGameContext)
 
-  // if no data return nothing
-  if (!pokemonData) return <></>
+  const pokemonData = pokemonDataArray[index];
 
   // change Number to number to allow for calculations
   let currentPoints = points as number;
   const [imageColourClass, setImageColourClass] = useState<string>("");
 
+  // if no data return nothing
+  if (!pokemonData) return <></>
+
   // when a pokemon is clicked
   function onClick() {
-
-    console.log(isWinner)
 
     // check if you have answered already before the reset
     if (!hasAnswered) {
 
-      if (isWinner) {
+      if (isWinnerArray[index]) {
         setImageColourClass("U-correct")
         setPoints(currentPoints + 1)
       }
-      if (!isWinner) {
+      if (!isWinnerArray[index]) {
         setImageColourClass("U-incorrect")
         setPoints(currentPoints - 1)
       }
