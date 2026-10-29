@@ -1,6 +1,8 @@
-import { useContext, useEffect, useState, type Dispatch, type SetStateAction } from "react";
-import { StatsGameContext, StatsGameContextProvider } from "~/contexts/stats_game_context";
-import { getTwoPokemon } from "~/helpers";
+import { useContext, useState } from "react";
+import {
+  StatsGameContext,
+  StatsGameContextProvider,
+} from "~/contexts/stats_game_context";
 
 export function meta() {
   return [
@@ -15,47 +17,14 @@ const MODE_NAMES = ["HP", "ATK", "DEF", "S.ATK", "S.DEF", "SPD", "TOTAL"];
 export default function StatsGameWrapper() {
   return (
     <StatsGameContextProvider>
-      <Stats_Game/>
+      <Stats_Game />
     </StatsGameContextProvider>
-  )
+  );
 }
 
 export function Stats_Game() {
-
   // extract properties from context
-  const {mode, modeIndex, pokemonDataArray, setPokemonDataArray, isWinnerArray, setIsWinnerArray , points} = useContext(StatsGameContext)
-
-  // update the page information based on fetched pokemon
-  const updatePageInfo = () => {
-    getTwoPokemon().then((data) => {
-      setPokemonDataArray(data);
-    })
-  }
-
-  useEffect(updatePageInfo, []);
-
-  // when pokemon are loaded find which one has the higher stat
-  useEffect(() => {
-    if (pokemonDataArray.length == 0) return;
-
-    // first pokemon has the higher stat
-    if (pokemonDataArray[0].stats[modeIndex].value > pokemonDataArray[1].stats[modeIndex].value) {
-      setIsWinnerArray([true, false])
-    }
-
-    // second pokemon has the higher stat
-    else if (pokemonDataArray[0].stats[modeIndex].value < pokemonDataArray[1].stats[modeIndex].value) {
-      setIsWinnerArray([false, true]);
-    }
-
-    // in case of a draw
-    else {
-      setIsWinnerArray([true, true]);
-    }
-
-    console.log(isWinnerArray)
-
-  }, [pokemonDataArray])
+  const { mode, points } = useContext(StatsGameContext);
 
   return (
     <div id="statsGame">
@@ -70,15 +39,13 @@ export function Stats_Game() {
       {/* mode buttons row */}
       <div id="statsGame__modesRow" className="U-flexAlignJustify">
         {MODE_NAMES.map((name, index) => {
-          return (
-            <StatButton name={name} updatePageInfo={updatePageInfo} key={index}></StatButton>
-          )
+          return <StatButton name={name} key={index}></StatButton>;
         })}
       </div>
       {/* clickable pokemon row */}
       <div id="statsGame__clickablesRow" className="U-flexAlignJustify">
-        <PokemonBox index={0} updatePageInfo={updatePageInfo}></PokemonBox>
-        <PokemonBox index={1} updatePageInfo={updatePageInfo}></PokemonBox>
+        <PokemonBox index={0}></PokemonBox>
+        <PokemonBox index={1}></PokemonBox>
       </div>
       {/* score row */}
       <div id="statsGame__scoreRow" className="U-flexAlignJustify">
@@ -86,7 +53,9 @@ export function Stats_Game() {
       </div>
       {/* question row */}
       <div id="statsGame__questionRow" className="U-flexAlignJustify">
-        <p id="statsGame__questionRow__text">Which pokemon has the higher {mode} stat?</p>
+        <p id="statsGame__questionRow__text">
+          Which pokemon has the higher {mode} stat?
+        </p>
       </div>
     </div>
   );
@@ -94,16 +63,16 @@ export function Stats_Game() {
 
 // buttons components
 interface ModeNamesProps {
-  name: string,
-  updatePageInfo: VoidFunction,
+  name: string;
 }
 
 // creates a button that allows you to switch the game mode
 function StatButton(props: ModeNamesProps) {
-  const { name, updatePageInfo, } = props;
+  const { name } = props;
 
   //extract context properties
-  const {setMode, setModeIndex, setPoints} = useContext(StatsGameContext)
+  const { setMode, setModeIndex, setPoints, updatePageInfo } =
+    useContext(StatsGameContext);
 
   // when a button is clicked
   function onClick() {
@@ -115,73 +84,93 @@ function StatButton(props: ModeNamesProps) {
   }
 
   return (
-    <input className="statsGame__modesRow__buttons" type="button" value={name} onClick={onClick}></input>
-  )
+    <input
+      className="statsGame__modesRow__buttons"
+      type="button"
+      value={name}
+      onClick={onClick}
+    ></input>
+  );
 }
 
 interface pokemonBoxProps {
-  index: number,
-  updatePageInfo: VoidFunction
+  index: number;
 }
 
 // clickable pokemon component
 function PokemonBox(props: pokemonBoxProps) {
-  const { index, updatePageInfo } = props;
+  const { index } = props;
 
   //extract context properties
-  const {mode, modeIndex, pokemonDataArray, isWinnerArray, points, setPoints, hasAnswered, setHasAnswered} = useContext(StatsGameContext)
-
-  const pokemonData = pokemonDataArray[index];
+  const {
+    mode,
+    modeIndex,
+    pokemonDataArray,
+    isWinnerArray,
+    points,
+    setPoints,
+    hasAnswered,
+    setHasAnswered,
+    updatePageInfo,
+  } = useContext(StatsGameContext);
 
   // change Number to number to allow for calculations
   let currentPoints = points as number;
   const [imageColourClass, setImageColourClass] = useState<string>("");
 
   // if no data return nothing
-  if (!pokemonData) return <></>
+  if (!pokemonDataArray[index]) return <></>;
 
   // when a pokemon is clicked
   function onClick() {
-
     // check if you have answered already before the reset
     if (!hasAnswered) {
-
+      // if you clicked the correct one
       if (isWinnerArray[index]) {
-        setImageColourClass("U-correct")
-        setPoints(currentPoints + 1)
-      }
-      if (!isWinnerArray[index]) {
-        setImageColourClass("U-incorrect")
-        setPoints(currentPoints - 1)
+        setImageColourClass("U-correct");
+        setPoints(currentPoints + 1);
       }
 
-      setHasAnswered(true)
+      // if you clicked the incorrect one
+      if (!isWinnerArray[index]) {
+        setImageColourClass("U-incorrect");
+        setPoints(currentPoints - 1);
+      }
 
       // reset page elements
+      setHasAnswered(true);
+
       setTimeout(() => {
         updatePageInfo();
         setHasAnswered(false);
-        setImageColourClass("")
-      }, 3000)
-
+        setImageColourClass("");
+      }, 3000);
     }
-
   }
 
   return (
     <div className="statsGame__clickablesRow__pokemonBox">
       {/* image section */}
       <div className="statsGame__clickablesRow__pokemonBox__image U-flexAlignJustify">
-        <img src={pokemonData.image} className={`statsGame__clickablesRow__pokemonBox__image__img U-flexAlignJustify ${imageColourClass}`} onClick={onClick}></img>
+        <img
+          src={pokemonDataArray[index].image}
+          className={`statsGame__clickablesRow__pokemonBox__image__img U-flexAlignJustify ${imageColourClass}`}
+          onClick={onClick}
+        ></img>
       </div>
       {/* name section */}
       <div className="statsGame__clickablesRow__pokemonBox__name U-flexAlignJustify">
-        <p className="statsGame__clickablesRow__pokemonBox__name__text U-flexAlignJustify">{pokemonData.name}</p>
+        <p className="statsGame__clickablesRow__pokemonBox__name__text U-flexAlignJustify">
+          {pokemonDataArray[index].name}
+        </p>
       </div>
       {/* stats section */}
       <div className="statsGame__clickablesRow__pokemonBox__value U-flexAlignJustify">
-        <p className="statsGame__clickablesRow__pokemonBox__value__text">{mode} - {hasAnswered ? pokemonData.stats[modeIndex].value : "?"}</p>
+        <p className="statsGame__clickablesRow__pokemonBox__value__text">
+          {mode} -{" "}
+          {hasAnswered ? pokemonDataArray[index].stats[modeIndex].value : "?"}
+        </p>
       </div>
     </div>
-  )
+  );
 }

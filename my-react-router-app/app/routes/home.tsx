@@ -9,7 +9,7 @@ export function meta() {
 }
 
 export default function Home() {
-  const [pokemonData, setPokemonData] = useState<any>()
+  const [pokemonData, setPokemonData] = useState<any>();
 
   // sets pikachu as the default display pokemon
   const [pokemonName, setPokemonName] = useState<string>("pikachu");
@@ -20,16 +20,15 @@ export default function Home() {
   // uses the pokemon data from the server to update the page info
   function updatePageInfo() {
     getPokemon(pokemonName).then((data) => {
-      if(data) {
+      if (data) {
         setPokemonData(data);
+      } else {
+        alert("Pokemon not found. try checking your spelling");
       }
-      else {
-        alert("Pokemon not found. try checking your spelling")
-      }
-    })
+    });
   }
 
-  useEffect(updatePageInfo, [])
+  useEffect(updatePageInfo, []);
 
   // on input change the page info
   function onKeyDown(event: any) {
@@ -37,7 +36,6 @@ export default function Home() {
       updatePageInfo();
     }
   }
-
 
   return (
     <section id="home">
@@ -53,61 +51,80 @@ export default function Home() {
 
       {/* description row */}
       <div id="home__descriptionRow" className="U-flexAlignJustify">
-        <p id="home__descriptionRow__text">{pokemonData?.name} - {pokemonData?.types}</p>
+        <p id="home__descriptionRow__text">
+          {pokemonData?.name} - {pokemonData?.types}
+        </p>
       </div>
 
       {/* stats row */}
       <div id="home__statsRow" className="U-flexAlignJustify">
         <StatsDisplay stats={pokemonData?.stats} />
       </div>
-      
+
       {/* input row */}
       <div id="home__inputRow" className="U-flexAlignJustify">
         <p id="home__inputRow__text">Pokemon Name / ID - </p>
-        <input id="home_inputRow_input" value={pokemonName} onChange={updatePokemonName} onKeyDown={onKeyDown} ></input>
+        <input
+          id="home_inputRow_input"
+          value={pokemonName}
+          onChange={updatePokemonName}
+          onKeyDown={onKeyDown}
+        ></input>
       </div>
     </section>
   );
-
 }
 
 interface StatRowProps {
-  name: string,
-  value: number,
-  length: number
+  name: string;
+  value: number;
+  length: number;
 }
 
 interface StatsDisplayProps {
-  stats: StatRowProps[]
+  stats: StatRowProps[];
 }
 
 // gets the stats for the pokemon from the server
 function StatsDisplay(props: StatsDisplayProps) {
-  const { stats } = props
+  const { stats } = props;
 
-  if (!stats) return <></>
+  // if nothing is found return nothing
+  if (!stats) return <></>;
 
-  return (<>
-    {stats.map((stat, index) => {
-      return (<StatRow name={stat.name} value={stat.value} length={stat.length} key={index}></StatRow>)
-    })}
-  </>)
+  return (
+    <>
+      {stats.map((stat, index) => {
+        return (
+          <StatRow
+            name={stat.name}
+            value={stat.value}
+            length={stat.length}
+            key={index}
+          ></StatRow>
+        );
+      })}
+    </>
+  );
 }
 
 function StatRow(props: StatRowProps) {
-  const { name, value, length } = props
+  const { name, value, length } = props;
   return (
     <div className="home__statsRow__row U-flexAlignJustify">
+      {/* name section */}
       <div className="home__statsRow__row__name U-flexAlignJustify">
         <p>{name}</p>
       </div>
+      {/* value section */}
       <div className="home__statsRow__row__value">
-        <div className="home__statsRow__row__value__bar U-flexAlignJustify" style={{ width: `${length}%` }}>
+        <div
+          className="home__statsRow__row__value__bar U-flexAlignJustify"
+          style={{ width: `${length}%` }}
+        >
           <p className="home__statsRow__row__value__bar__text">{value}</p>
         </div>
       </div>
     </div>
-  )
-
+  );
 }
-
