@@ -1,4 +1,5 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useContext, useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { StatsGameContext, StatsGameContextProvider } from "~/contexts/stats_game_context";
 import { getTwoPokemon } from "~/helpers";
 
 export function meta() {
@@ -11,10 +12,18 @@ export function meta() {
 // names of the game modes
 const MODE_NAMES = ["HP", "ATK", "DEF", "S.ATK", "S.DEF", "SPD", "TOTAL"];
 
-export default function Stats_Game() {
+export default function StatsGameWrapper() {
+  return (
+    <StatsGameContextProvider>
+      <Stats_Game/>
+    </StatsGameContextProvider>
+  )
+}
 
-  // mode based on the selected button (default hp)
-  const [mode, setMode] = useState<string>("HP");
+export function Stats_Game() {
+
+  // extract properties from context
+  const {mode} = useContext(StatsGameContext)
 
   // index of mode in MODE_NAMES
   const [modeIndex, setModeIndex] = useState<number>(0)
@@ -77,14 +86,14 @@ export default function Stats_Game() {
       <div id="statsGame__modesRow" className="U-flexAlignJustify">
         {MODE_NAMES.map((name, index) => {
           return (
-            <StatButton name={name} setMode={setMode} setModeIndex={setModeIndex} updatePageInfo={updatePageInfo} setPoints={setPoints} key={index}></StatButton>
+            <StatButton name={name} setModeIndex={setModeIndex} updatePageInfo={updatePageInfo} setPoints={setPoints} key={index}></StatButton>
           )
         })}
       </div>
       {/* clickable pokemon row */}
       <div id="statsGame__clickablesRow" className="U-flexAlignJustify">
-        <PokemonBox pokemonData={pokemonData[0]} statName={mode} modeIndex={modeIndex} isWinner={isWinner[0]} points={points} setPoints={setPoints} hasAnswered={hasAnswered} setHasAnswered={setHasAnswered} updatePageInfo={updatePageInfo}></PokemonBox>
-        <PokemonBox pokemonData={pokemonData[1]} statName={mode} modeIndex={modeIndex} isWinner={isWinner[1]} points={points} setPoints={setPoints} hasAnswered={hasAnswered} setHasAnswered={setHasAnswered} updatePageInfo={updatePageInfo}></PokemonBox>
+        <PokemonBox pokemonData={pokemonData[0]} modeIndex={modeIndex} isWinner={isWinner[0]} points={points} setPoints={setPoints} hasAnswered={hasAnswered} setHasAnswered={setHasAnswered} updatePageInfo={updatePageInfo}></PokemonBox>
+        <PokemonBox pokemonData={pokemonData[1]} modeIndex={modeIndex} isWinner={isWinner[1]} points={points} setPoints={setPoints} hasAnswered={hasAnswered} setHasAnswered={setHasAnswered} updatePageInfo={updatePageInfo}></PokemonBox>
       </div>
       {/* score row */}
       <div id="statsGame__scoreRow" className="U-flexAlignJustify">
@@ -101,7 +110,6 @@ export default function Stats_Game() {
 // buttons components
 interface ModeNamesProps {
   name: string,
-  setMode: Dispatch<SetStateAction<string>>,
   setModeIndex: any,
   updatePageInfo: VoidFunction,
   setPoints: any
@@ -109,7 +117,10 @@ interface ModeNamesProps {
 
 // creates a button that allows you to switch the game mode
 function StatButton(props: ModeNamesProps) {
-  const { name, setMode, setModeIndex, updatePageInfo, setPoints } = props;
+  const { name, setModeIndex, updatePageInfo, setPoints } = props;
+
+  //extract context properties
+  const {setMode} = useContext(StatsGameContext)
 
   // when a button is clicked
   function onClick() {
@@ -127,7 +138,6 @@ function StatButton(props: ModeNamesProps) {
 
 interface pokemonBoxProps {
   pokemonData: any,
-  statName: string,
   modeIndex: number,
   isWinner: boolean,
   points: Number,
@@ -139,7 +149,10 @@ interface pokemonBoxProps {
 
 // clickable pokemon component
 function PokemonBox(props: pokemonBoxProps) {
-  const { pokemonData, statName, modeIndex, isWinner, points, setPoints, hasAnswered, setHasAnswered, updatePageInfo } = props;
+  const { pokemonData, modeIndex, isWinner, points, setPoints, hasAnswered, setHasAnswered, updatePageInfo } = props;
+
+  //extract context properties
+  const {mode} = useContext(StatsGameContext)
 
   // if no data return nothing
   if (!pokemonData) return <></>
@@ -190,7 +203,7 @@ function PokemonBox(props: pokemonBoxProps) {
       </div>
       {/* stats section */}
       <div className="statsGame__clickablesRow__pokemonBox__value U-flexAlignJustify">
-        <p className="statsGame__clickablesRow__pokemonBox__value__text">{statName} - {hasAnswered ? pokemonData.stats[modeIndex].value : "?"}</p>
+        <p className="statsGame__clickablesRow__pokemonBox__value__text">{mode} - {hasAnswered ? pokemonData.stats[modeIndex].value : "?"}</p>
       </div>
     </div>
   )
