@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getJSON } from "~/helpers";
+import { getPokemon } from "~/helpers";
 
 export function meta() {
   return [
@@ -13,12 +13,19 @@ export default function Home() {
 
   // sets pikachu as the default display pokemon
   const [pokemonName, setPokemonName] = useState<string>("pikachu");
+
+  // set pokmeon to the input pokemon
   const updatePokemonName = (e: any) => setPokemonName(e.target.value);
 
   // uses the pokemon data from the server to update the page info
   function updatePageInfo() {
-    getJSON(pokemonName).then((data) => {
-      setPokemonData(data);
+    getPokemon(pokemonName).then((data) => {
+      if(data) {
+        setPokemonData(data);
+      }
+      else {
+        alert("Pokemon not found. try checking your spelling")
+      }
     })
   }
 
@@ -64,6 +71,12 @@ export default function Home() {
 
 }
 
+interface StatRowProps {
+  name: string,
+  value: number,
+  length: number
+}
+
 interface StatsDisplayProps {
   stats: StatRowProps[]
 }
@@ -79,12 +92,6 @@ function StatsDisplay(props: StatsDisplayProps) {
       return (<StatRow name={stat.name} value={stat.value} length={stat.length} key={index}></StatRow>)
     })}
   </>)
-}
-
-interface StatRowProps {
-  name: string,
-  value: number,
-  length: number
 }
 
 function StatRow(props: StatRowProps) {
